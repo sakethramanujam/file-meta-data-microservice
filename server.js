@@ -1,0 +1,39 @@
+'use strict';
+
+var express = require('express');
+var cors = require('cors');
+var multer = require('multer');
+// require and use "multer"...
+
+var app = express();
+
+app.use(cors());
+app.use('/public', express.static(process.cwd() + '/public'));
+
+app.get('/', function (req, res) {
+     res.sendFile(process.cwd() + '/views/index.html');
+  });
+
+app.get('/hello', function(req, res){
+  res.json({greetings: "Hello, API"});
+});
+
+var storage = multer.memoryStorage();
+var upload = multer({ storage: storage });
+
+app.post('/api/fileanalyse', upload.single('upfile'),function(req,res){
+
+//var filename = req.file.originalname;
+//var type = req.file.mimetype;
+//var size = req.file.size;
+if(req.file){
+  res.status(200).json({"filename":req.file.originalname,"type":req.file.mimetype,"size":req.file.size});
+}
+else{
+  res.status(500).json({"message":'No File available for parsing'});
+}
+});
+
+app.listen(process.env.PORT || 3000, function () {
+  console.log('Node.js listening ...');
+});
